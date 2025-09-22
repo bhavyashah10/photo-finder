@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding Photo Finder</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎉 Wedding Photo Finder</h1>
+            <p>Find all your wedding photos with ease!</p>
+        </header>
+
+        <div class="main-content">
+            <div class="option-cards">
+                <div class="card">
+                    <div class="card-icon">📸</div>
+                    <h3>I'm the Photographer</h3>
+                    <p>Upload all wedding photos to the system</p>
+                    <a href="/photographer" class="btn btn-primary">Upload Photos</a>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">👤</div>
+                    <h3>I'm a Wedding Guest</h3>
+                    <p>Upload your photo to find all pictures of yourself</p>
+                    <a href="/guest" class="btn btn-secondary">Find My Photos</a>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Upload a photo of yourself and we'll find all wedding photos containing your face!</p>
+        </footer>
+    </div>
+</body>
+</html>
