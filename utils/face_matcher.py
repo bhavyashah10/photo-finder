@@ -9,19 +9,22 @@ from datetime import datetime
 
 class FaceMatcher:
     """
-    A utility class for face detection, encoding, and matching in wedding photos.
+    A utility class for face detection, encoding, and matching in photos.
     """
     
-    def __init__(self, tolerance=0.6, model='hog'):
+    def __init__(self, tolerance=0.45, model='cnn', min_confidence=0.55):
         """
-        Initialize the FaceMatcher.
+        Initialize the FaceMatcher with more strict settings.
         
         Args:
             tolerance (float): How strict the face matching should be. Lower is more strict.
+                              Recommended: 0.4-0.5 for strict matching, 0.6 for loose matching
             model (str): Face detection model to use ('hog' for CPU, 'cnn' for GPU)
+            min_confidence (float): Minimum confidence score to accept a match (0.0-1.0)
         """
         self.tolerance = tolerance
         self.model = model
+        self.min_confidence = min_confidence  # Add minimum confidence threshold
         self.encodings_cache = {}
         self.cache_file = 'face_encodings_cache.pkl'
         self.load_cache()
@@ -158,15 +161,7 @@ class FaceMatcher:
     
     def find_matching_photos(self, guest_photo_path, wedding_photos_folder, allowed_extensions=None):
         """
-        Find all wedding photos that contain the guest's face.
-        
-        Args:
-            guest_photo_path (str): Path to guest's reference photo
-            wedding_photos_folder (str): Folder containing wedding photos
-            allowed_extensions (set): Set of allowed file extensions
-            
-        Returns:
-            dict: Results containing matches and statistics
+        Find all wedding photos that contain the guest's face with improved filtering.
         """
         if allowed_extensions is None:
             allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'bmp', 'tiff'}
@@ -189,12 +184,14 @@ class FaceMatcher:
         processed_count = 0
         error_count = 0
         total_faces_found = 0
+        rejected_low_confidence = 0
         
         # Get all wedding photo files
         wedding_files = [f for f in os.listdir(wedding_photos_folder) 
                         if f.lower().split('.')[-1] in allowed_extensions]
         
         print(f"Processing {len(wedding_files)} wedding photos...")
+        print(f"Using tolerance: {self.tolerance}, min_confidence: {self.min_confidence}")
         
         for filename in wedding_files:
             try:
@@ -205,20 +202,39 @@ class FaceMatcher:
                 total_faces_found += len(wedding_encodings)
                 
                 # Check each face in the wedding photo
+                best_match_confidence = 0
+                best_match_distance = float('inf')
+                
                 for i, wedding_encoding in enumerate(wedding_encodings):
                     # Compare faces
                     face_distances = face_recognition.face_distance([wedding_encoding], guest_encoding)
-                    is_match = face_distances[0] <= self.tolerance
+                    face_distance = face_distances[0]
+                    confidence = 1 - face_distance
                     
-                    if is_match:
-                        matches.append({
-                            'filename': filename,
-                            'path': f'/static/uploads/wedding_photos/{filename}',
-                            'confidence': float(1 - face_distances[0]),  # Convert to confidence score
-                            'face_index': i
-                        })
-                        print(f"Match found in {filename} (confidence: {1 - face_distances[0]:.3f})")
-                        break  # Found a match in this photo, move to next photo
+                    # Check both tolerance and minimum confidence
+                    if face_distance <= self.tolerance and confidence >= self.min_confidence:
+                        # Keep track of the best match in this photo
+                        if confidence > best_match_confidence:
+                            best_match_confidence = confidence
+                            best_match_distance = face_distance
+                
+                # Only add the photo if we found a good match
+                if best_match_confidence > 0:
+                    matches.append({
+                        'filename': filename,
+                        'path': f'/static/uploads/wedding_photos/{filename}',
+                        'confidence': float(best_match_confidence),
+                        'face_distance': float(best_match_distance)
+                    })
+                    print(f"✓ Strong match in {filename} (confidence: {best_match_confidence:.3f}, distance: {best_match_distance:.3f})")
+                else:
+                    # Check if there were faces but they didn't meet our criteria
+                    for wedding_encoding in wedding_encodings:
+                        face_distance = face_recognition.face_distance([wedding_encoding], guest_encoding)[0]
+                        if face_distance <= self.tolerance:  # Met tolerance but not confidence
+                            rejected_low_confidence += 1
+                            print(f"✗ Rejected {filename} - low confidence: {1-face_distance:.3f}")
+                            break
                 
             except Exception as e:
                 print(f"Error processing {filename}: {e}")
@@ -234,9 +250,16 @@ class FaceMatcher:
         stats = {
             'total_photos_processed': processed_count,
             'total_faces_found': total_faces_found,
+            'rejected_low_confidence': rejected_low_confidence,
             'errors': error_count,
-            'processing_time': 'completed'
+            'average_confidence': sum(m['confidence'] for m in matches) / len(matches) if matches else 0,
+            'tolerance_used': self.tolerance,
+            'min_confidence_used': self.min_confidence
         }
+        
+        print(f"\nResults: {len(matches)} matches found, {rejected_low_confidence} rejected for low confidence")
+        if matches:
+            print(f"Confidence range: {min(m['confidence'] for m in matches):.3f} - {max(m['confidence'] for m in matches):.3f}")
         
         return {
             'success': True,

@@ -13,7 +13,7 @@ app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # Initialize face matcher
-face_matcher = FaceMatcher(tolerance=0.6, model='hog')  # Use 'cnn' if you have GPU
+face_matcher = FaceMatcher(tolerance=0.45, model='cnn', min_confidence=0.55) # Use 'cnn' if you have GPU
 
 # Create upload directories
 UPLOAD_FOLDER = 'static/uploads'
