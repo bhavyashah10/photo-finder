@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Find Your Photos - Wedding Photo Finder</title>
+    <title>Photo Finder</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>👤 Find Your Wedding Photos</h1>
-            <p>Upload a clear photo of yourself and we'll find all wedding photos containing your face</p>
+            <h1>👤 Find your Photos</h1>
+            <p>Upload a clear photo of yourself and we'll find all photos containing your face</p>
             <a href="/" class="back-link">← Back to Home</a>
         </header>
 
@@ -50,7 +50,7 @@
             </div>
 
             <div id="matches-section" class="matches-section" style="display: none;">
-                <h3>Your Wedding Photos</h3>
+                <h3>Your Photos</h3>
                 <div id="matches-grid" class="photo-grid"></div>
                 <div id="download-section" class="download-section">
                     <button id="download-all-btn" class="btn btn-secondary">Download All Matches</button>
@@ -120,7 +120,7 @@
                             const photoDiv = document.createElement('div');
                             photoDiv.className = 'photo-item match-item';
                             photoDiv.innerHTML = `
-                                <img src="${match.path}" alt="Wedding photo ${index + 1}" loading="lazy">
+                                <img src="${match.path}" alt="photo ${index + 1}" loading="lazy">
                                 <div class="photo-actions">
                                     <a href="${match.path}" download="${match.filename}" class="btn btn-small">Download</a>
                                 </div>

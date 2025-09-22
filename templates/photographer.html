@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photographer Upload - Wedding Photo Finder</title>
+    <title>Photographer Upload - Photo Finder</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
         <header>
             <h1>📸 Photographer Portal</h1>
-            <p>Upload all wedding photos here</p>
+            <p>Upload all photos here</p>
             <a href="/" class="back-link">← Back to Home</a>
         </header>
 
@@ -22,13 +22,13 @@
                 </div>
 
                 <div class="upload-form">
-                    <h3>Upload Wedding Photos</h3>
+                    <h3>Upload Photos</h3>
                     <form id="photo-upload-form" enctype="multipart/form-data">
                         <div class="file-input-wrapper">
                             <input type="file" id="photo-files" name="photos" multiple accept="image/*" required>
                             <label for="photo-files" class="file-input-label">
                                 <span class="file-icon">📁</span>
-                                <span class="file-text">Choose wedding photos (multiple selection allowed)</span>
+                                <span class="file-text">Choose photos (multiple selection allowed)</span>
                             </label>
                         </div>
                         
@@ -45,7 +45,7 @@
             </div>
 
             <div class="existing-photos">
-                <h3>Existing Wedding Photos</h3>
+                <h3>Existing Photos</h3>
                 <button id="load-photos-btn" class="btn btn-secondary">Load Photos</button>
                 <div id="photo-grid" class="photo-grid"></div>
             </div>
