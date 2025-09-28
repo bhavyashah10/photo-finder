@@ -251,13 +251,10 @@ This project is open source. Please check the LICENSE file for details.
 
 - [ ] Multiple face detection per guest photo
 - [ ] Batch guest processing
-- [ ] Advanced filtering and sorting options
-- [ ] Mobile app version
 - [ ] Cloud storage integration
 - [ ] Real-time processing status
 - [ ] Photo metadata preservation
-- [ ] Automated photo organization
-- [ ] Integration with popular photo sharing platforms
+- [ ] Advanced filtering and sorting options
 
 ---
 
